@@ -79,6 +79,12 @@ class Events
     #[ORM\ManyToMany(targetEntity: Tags::class, mappedBy: 'events')]
     private Collection $tags;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $description = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $date_description = null;
+
     
 
     /**
@@ -328,6 +334,30 @@ class Events
     public function setCoverCredit(?string $cover_credit): static
     {
         $this->cover_credit = $cover_credit;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getDateDescription(): ?string
+    {
+        return $this->date_description;
+    }
+
+    public function setDateDescription(?string $date_description): static
+    {
+        $this->date_description = $date_description;
 
         return $this;
     }
