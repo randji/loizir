@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
+
 #[ORM\Entity(repositoryClass: EventsRepository::class)]
 #[ORM\Index(name: 'idx_title', columns: ['title'])]
 #[ORM\Index(name: 'idx_date_start', columns: ['date_start'])]
@@ -72,7 +73,7 @@ class Events
     private ?string $cover_credit = null;
 
 
-    #[ORM\ManyToOne(targetEntity: Locations::class)]
+    #[ORM\ManyToOne(targetEntity: Locations::class, inversedBy: 'events')]
     #[ORM\JoinColumn(nullable: true)]
     private ?Locations $location = null;
 
@@ -85,8 +86,42 @@ class Events
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $date_description = null;
 
-    
+    #[ORM\ManyToMany(targetEntity: Contacts::class, inversedBy: 'events')]
+    private Collection $contacts;
 
+    public function __construct()
+    {
+        $this->contacts = new ArrayCollection();
+        $this->tags = new ArrayCollection();
+    }
+
+    /**
+     * @return Collection<int, Contacts>
+     */
+    public function getContacts(): Collection
+    {
+        return $this->contacts;
+    }
+
+    public function addContact(Contacts $contact): self
+    {
+        if (!$this->contacts->contains($contact)) {
+            $this->contacts->add($contact);
+            $contact->setEvent($this);
+        }
+        return $this;
+    }
+
+    public function removeContact(Contacts $contact): self
+    {
+        if ($this->contacts->removeElement($contact)) {
+            
+            if ($contact->getEvent() === $this) {
+                $contact->setEvent(null);
+            }
+        }
+        return $this;
+    }
     /**
      * @return Collection<int, Tags>
      */
@@ -111,13 +146,6 @@ class Events
         return $this;
     }
 
-    public function __construct()
-    {
-        $this->tags = new ArrayCollection();
-    }
-    
-
-
     public function getLocation(): ?Locations
     {
         return $this->location;
@@ -127,6 +155,14 @@ class Events
     {
         $this->location = $location;
 
+        return $this;
+    }
+
+    public function addLocation(Locations $location): self
+{
+    if (!$this->location) {
+            $this->location = $location;
+        }
         return $this;
     }
     public function getId(): ?int

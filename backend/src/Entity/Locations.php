@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\LocationsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: LocationsRepository::class)]
 #[ORM\Index(name: 'idx_address_name', columns: ['address_name'], options: ['lengths' => [255]])]
@@ -38,6 +40,38 @@ class Locations
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $transport = null;
+    
+    #[ORM\OneToMany(targetEntity: Events::class, mappedBy: 'location')]
+    private Collection $events;
+
+    public function __construct()
+    {
+        $this->events = new ArrayCollection();
+    }
+
+    public function getEvents(): Collection
+    {
+        return $this->events;
+    }
+
+    public function addEvent(Events $event): self
+    {
+        if (!$this->events->contains($event)) {
+            $this->events->add($event);
+            $event->setLocation($this);
+        }
+        return $this;
+    }
+
+    public function removeEvent(Events $event): self
+    {
+        if ($this->events->removeElement($event)) {
+            if ($event->getLocation() === $this) {
+                $event->setLocation(null);
+            }
+        }
+        return $this;
+    }
 
     public function getId(): ?int
     {

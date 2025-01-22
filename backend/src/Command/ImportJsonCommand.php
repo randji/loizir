@@ -41,7 +41,7 @@ class ImportJsonCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         // Chemin du fichier JSON
-        $filePath = __DIR__ . '/../../public/data/events.json';
+        $filePath = __DIR__ . '/../../public/data/events1.json';
 
         if (!file_exists($filePath)) {
             $io->error('Le fichier JSON est introuvable.');
@@ -56,6 +56,66 @@ class ImportJsonCommand extends Command
         }
 
         foreach ($jsonData as $eventData) {
+            // Debug au début de la boucle
+            $io->text('Traitement d\'un nouvel événement');
+            $io->text('Contact URL: ' . ($eventData['contact_url'] ?? 'non défini'));
+            $io->text('Contact Phone: ' . ($eventData['contact_phone'] ?? 'non défini'));
+            $io->text('Contact Mail: ' . ($eventData['contact_mail'] ?? 'non défini'));
+            $io->text('Contact Facebook: ' . ($eventData['contact_facebook'] ?? 'non défini'));
+            $io->text('Contact Twitter: ' . ($eventData['contact_twitter'] ?? 'non défini'));
+            
+            
+            
+
+            //tableau intermédiare pour Events
+            $eventsData =[
+                'url' => $eventData['url'] ?? 'A définir',
+                'title' => $eventData['title'] ?? 'A définir',
+                'lead_text' => $eventData['lead_text'] ?? 'A définir',
+                'description' => $eventData['description'] ?? 'A définir',
+                'date_description' => $eventData['date_description'] ?? 'A définir',
+                'date_start' => $eventData['date_start'] ?? '',
+                'date_end' => $eventData['date_end'] ?? '',
+                'price_type' => $eventData['price_type'] ?? 'A définir',
+                'price_detail' => $eventData['price_detail'] ?? 'A définir',
+                'access_type' => $eventData['access_type'] ?? 'A définir',
+                'access_link' => $eventData['access_link'] ?? 'A définir',
+                'audience' => $eventData['audience'] ?? 'A définir',
+                'childrens' => $eventData['childrens'] ?? 'A définir',
+                'groupes' => $eventData['groupes'] ?? 'A définir',
+                'programs' => $eventData['programs'] ?? 'A définir',
+                'title_event' => $eventData['title_event'] ?? 'A définir',
+                'cover_url' => $eventData['cover_url'] ?? 'A définir',
+                'cover_alt' => $eventData['cover_alt'] ?? 'A définir',
+                'cover_credit' => $eventData['cover_credit'] ?? 'A définir',
+            ];
+            
+            //Créer ou mettre à jour l'événement
+
+            $event = $this->entityManager->getRepository(Events::class)
+            ->findOneBy(['title' => $eventData['title'] ]) ?? new Events();
+
+            $event->setUrl($eventsData['url']);
+            $event->setTitle($eventsData['title']);
+            $event->setLeadText($eventsData['lead_text']);
+            $event->setDateStart(new \DateTime($eventsData['date_start']));
+            $event->setDateEnd(new \DateTime($eventsData['date_end']));
+            $event->setPriceType($eventsData['price_type']);
+            $event->setPriceDetail($eventsData['price_detail']);
+            $event->setAccessType($eventsData['access_type']);
+            $event->setAccessLink($eventsData['access_link']);
+            $event->setAudience($eventsData['audience']);
+            $event->setChildrens($eventsData['childrens']);
+            $event->setGroupes($eventsData['groupes']);
+            $event->setPrograms($eventsData['programs']);
+            $event->setTitleEvent($eventsData['title_event']);
+            $event->setCoverUrl($eventsData['cover_url']);
+            $event->setCoverAlt($eventsData['cover_alt']);
+            $event->setCoverCredit($eventsData['cover_credit']);
+            $event->setDescription($eventsData['description']);
+            $event->setDateDescription($eventsData['date_description']);
+
+            $this->entityManager->persist($event);
 
             //transforme les données pour correspondre à la base de données
 
@@ -84,57 +144,7 @@ class ImportJsonCommand extends Command
             $location->setTransport($locationData['transport']);
 
             $this->entityManager->persist($location);
-            
-
-            //tableau intermédiare pour Events
-            $eventData =[
-                'url' => $eventData['url'] ?? 'A définir',
-                'title' => $eventData['title'] ?? 'A définir',
-                'lead_text' => $eventData['lead_text'] ?? 'A définir',
-                'description' => $eventData['description'] ?? 'A définir',
-                'date_description' => $eventData['date_description'] ?? 'A définir',
-                'date_start' => $eventData['date_start'] ?? '',
-                'date_end' => $eventData['date_end'] ?? '',
-                'price_type' => $eventData['price_type'] ?? 'A définir',
-                'price_detail' => $eventData['price_detail'] ?? 'A définir',
-                'access_type' => $eventData['access_type'] ?? 'A définir',
-                'access_link' => $eventData['access_link'] ?? 'A définir',
-                'audience' => $eventData['audience'] ?? 'A définir',
-                'childrens' => $eventData['childrens'] ?? 'A définir',
-                'groupes' => $eventData['groupes'] ?? 'A définir',
-                'programs' => $eventData['programs'] ?? 'A définir',
-                'title_event' => $eventData['title_event'] ?? 'A définir',
-                'cover_url' => $eventData['cover_url'] ?? 'A définir',
-                'cover_alt' => $eventData['cover_alt'] ?? 'A définir',
-                'cover_credit' => $eventData['cover_credit'] ?? 'A définir',
-            ];
-            
-            //Créer ou mettre à jour l'événement
-
-            $event = $this->entityManager->getRepository(Events::class)
-            ->findOneBy(['title' => $eventData['title'] ]) ?? new Events();
-
-            $event->setUrl($eventData['url']);
-            $event->setTitle($eventData['title']);
-            $event->setLeadText($eventData['lead_text']);
-            $event->setDateStart(new \DateTime($eventData['date_start']));
-            $event->setDateEnd(new \DateTime($eventData['date_end']));
-            $event->setPriceType($eventData['price_type']);
-            $event->setPriceDetail($eventData['price_detail']);
-            $event->setAccessType($eventData['access_type']);
-            $event->setAccessLink($eventData['access_link']);
-            $event->setAudience($eventData['audience']);
-            $event->setChildrens($eventData['childrens']);
-            $event->setGroupes($eventData['groupes']);
-            $event->setPrograms($eventData['programs']);
-            $event->setTitleEvent($eventData['title_event']);
-            $event->setCoverUrl($eventData['cover_url']);
-            $event->setCoverAlt($eventData['cover_alt']);
-            $event->setCoverCredit($eventData['cover_credit']);
-            $event->setDescription($eventData['description']);
-            $event->setDateDescription($eventData['date_description']);
-
-            $this->entityManager->persist($event);
+            $event->addLocation($location);
 
             // Gestion des tags
             if (isset($eventData['tags']) && is_array($eventData['tags'])) {
@@ -155,77 +165,61 @@ class ImportJsonCommand extends Command
                 }
             }
 
-            //tableau intermédiaire Contacts
-            // $contactData = [
-            //     'contact_url' => $eventData['contact_url'] ?? 'A définir',
-            //     'contact_phone' => $eventData['contact_phone'] ?? 'A définir',
-            //     'contact_mail' => $eventData['contact_mail'] ?? 'A définir',
-            //     'contact_facebook' => $eventData['contact_facebook'] ?? 'A définir',
-            //     'contact_twitter' => $eventData['contact_twitter'] ?? 'A définir',
-            // ];
+           // Debug - Afficher le JSON complet
+           $io->text('Contenu du JSON pour cet événement :');
+           $io->text(json_encode($eventData, JSON_PRETTY_PRINT));
 
-            // Gestion des contacts
-            if (isset($eventData['contact_url']) || isset($eventData['contact_phone']) || 
-                isset($eventData['contact_mail']) || isset($eventData['contact_facebook']) || 
-                isset($eventData['contact_twitter'])) {
-                
-                    // Debug - Afficher les données de contact
-                var_dump("Données de contact trouvées :", [
-                    'url' => $eventData['contact_url'] ?? null,
-                    'phone' => $eventData['contact_phone'] ?? null,
-                    'mail' => $eventData['contact_mail'] ?? null,
-                    'facebook' => $eventData['contact_facebook'] ?? null,
-                    'twitter' => $eventData['contact_twitter'] ?? null
-                ]);
+           // Créer un nouveau contact
+           $contact = new Contacts();
+           $contact->setEvent($event);
+           $hasContact = false;
+           
+           // Debug avant traitement
+           $io->text('Traitement des contacts pour : ' . $event->getTitle());
+           
+           // Phone
+           if (isset($eventData['contact_phone'])) {
+               $contact->setContactPhone($eventData['contact_phone']);
+               $hasContact = true;
+               $io->text('Phone ajouté : ' . $eventData['contact_phone']);
+           }
+           
+           // Mail
+           if (isset($eventData['contact_mail'])) {
+               $contact->setContactMail($eventData['contact_mail']);
+               $hasContact = true;
+               $io->text('Mail ajouté : ' . $eventData['contact_mail']);
+           }
+           
+           // Facebook
+           if (isset($eventData['contact_facebook'])) {
+               $contact->setContactFacebook($eventData['contact_facebook']);
+               $hasContact = true;
+               $io->text('Facebook ajouté : ' . $eventData['contact_facebook']);
+           }
+           
+           // Twitter
+           if (isset($eventData['contact_twitter'])) {
+               $contact->setContactTwitter($eventData['contact_twitter']);
+               $hasContact = true;
+               $io->text('Twitter ajouté : ' . $eventData['contact_twitter']);
+           }
 
-                $contact = new Contacts(); 
-                
-                // Vérification et nettoyage des données de contact
-                if (isset($eventData['contact_url']) && $eventData['contact_url'] !== 'A définir') {
-                    $contact->setContactUrl($eventData['contact_url']);
-                }
-                
-                if (isset($eventData['contact_phone']) && $eventData['contact_phone'] !== 'A définir') {
-                    $contact->setContactPhone($eventData['contact_phone']);
-                }
-                
-                if (isset($eventData['contact_mail']) && $eventData['contact_mail'] !== 'A définir') {
-                    $contact->setContactMail($eventData['contact_mail']);
-                }
-                
-                if (isset($eventData['contact_facebook']) && $eventData['contact_facebook'] !== 'A définir') {
-                    $contact->setContactFacebook($eventData['contact_facebook']);
-                }
-                
-                if (isset($eventData['contact_twitter']) && $eventData['contact_twitter'] !== 'A définir') {
-                    $contact->setContactTwitter($eventData['contact_twitter']);
-                }
+           // URL - on utilise la clé 'url' qui existe
+           if (isset($eventData['url'])) {
+               $contact->setContactUrl($eventData['url']);
+               $hasContact = true;
+               $io->text('URL ajoutée : ' . $eventData['url']);
+           }
 
-                // Lier l'événement au contact
-                $contact->setEvent($event);
-                
-                 // Debug - Vérifier l'état final du contact
-                 var_dump("Contact final:", [
-                    'url' => $contact->getContactUrl(),
-                    'phone' => $contact->getContactPhone(),
-                    'mail' => $contact->getContactMail(),
-                    'facebook' => $contact->getContactFacebook(),
-                    'twitter' => $contact->getContactTwitter()
-                ]);
-
-                
-                // Ne persister que si au moins un champ est rempli
-                if ($contact->getContactUrl() || $contact->getContactPhone() || 
-                    $contact->getContactMail() || $contact->getContactFacebook() || 
-                    $contact->getContactTwitter()) {
-                    $this->entityManager->persist($contact);
-                }
-            }
-
+           // Persister uniquement si on a des contacts
+           if ($hasContact) {
+               $this->entityManager->persist($contact);
+               $this->entityManager->flush();
+               $io->text('Contact sauvegardé en base');
+           }
         }
         
-        $this->entityManager->flush();
-
         $io->success('Les données ont été importées avec succès.');
         return Command::SUCCESS;
     }
