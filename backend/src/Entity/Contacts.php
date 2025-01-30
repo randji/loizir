@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\ContactsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: ContactsRepository::class)]
 class Contacts
@@ -23,27 +25,35 @@ class Contacts
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $contact_mail = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 500, nullable: true)]
     private ?string $contact_facebook = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $contact_twitter = null;
+    
+    #[ORM\ManyToMany(targetEntity: Events::class, mappedBy: 'contacts')]
+    private Collection $events;
 
-    #[ORM\ManyToOne(targetEntity: Events::class)]
-    #[ORM\JoinColumn(nullable:true)]
-    private ?Events $event = null;
-
-    public function getEvent(): ?Events
+    public function __construct()
     {
-        return $this->event;
+        $this->events = new ArrayCollection();
     }
 
-    public function setEvent(?Events $event): static
+    public function getEvents(): Collection
     {
-        $this->event = $event;
+        return $this->events;
+    }
 
+
+    public function addEvent(Events $event): self
+    {
+        if (!$this->events->contains($event)) {
+            $this->events->add($event);
+            $event->addContact($this);
+        }
         return $this;
     }
+
 
     public function getId(): ?int
     {

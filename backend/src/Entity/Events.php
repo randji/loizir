@@ -107,21 +107,16 @@ class Events
     {
         if (!$this->contacts->contains($contact)) {
             $this->contacts->add($contact);
-            $contact->setEvent($this);
         }
         return $this;
     }
 
     public function removeContact(Contacts $contact): self
     {
-        if ($this->contacts->removeElement($contact)) {
-            
-            if ($contact->getEvent() === $this) {
-                $contact->setEvent(null);
-            }
-        }
+        $this->contacts->removeElement($contact);
         return $this;
     }
+
     /**
      * @return Collection<int, Tags>
      */

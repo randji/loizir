@@ -159,9 +159,16 @@ class ImportJsonCommand extends Command
                         $tag->setName($tagName);
                         $this->entityManager->persist($tag);
                     }
+
+                    // Créer la relation bidirectionnelle
+                   $event->addTag($tag);
+                   $tag->addEvent($event);
+                   
+                   $io->text('Tag ajouté : ' . $tagName);
                     
-                    // Ajouter le tag à l'événement
-                    $event->addTag($tag);
+                     // Persister et flush
+                    $this->entityManager->persist($event);
+                    $this->entityManager->flush();
                 }
             }
 
@@ -169,13 +176,22 @@ class ImportJsonCommand extends Command
            $io->text('Contenu du JSON pour cet événement :');
            $io->text(json_encode($eventData, JSON_PRETTY_PRINT));
 
-           // Créer un nouveau contact
-           $contact = new Contacts();
-           $contact->setEvent($event);
-           $hasContact = false;
-           
+            // Vérifier si le contact existe déjà
+            $existingContact = null;
+            if (isset($eventData['contact_phone'])) {
+                $existingContact = $this->entityManager->getRepository(Contacts::class)
+                    ->findOneBy(['contact_phone' => $eventData['contact_phone']]);
+            } elseif (isset($eventData['contact_mail'])) {
+                $existingContact = $this->entityManager->getRepository(Contacts::class)
+                    ->findOneBy(['contact_mail' => $eventData['contact_mail']]);
+            }
+ 
+            // Utiliser le contact existant ou en créer un nouveau
+            $contact = $existingContact ?? new Contacts();
+            $hasContact = false;
            // Debug avant traitement
            $io->text('Traitement des contacts pour : ' . $event->getTitle());
+           
            
            // Phone
            if (isset($eventData['contact_phone'])) {
@@ -211,6 +227,9 @@ class ImportJsonCommand extends Command
                $hasContact = true;
                $io->text('URL ajoutée : ' . $eventData['url']);
            }
+            // Créer la relation entre l'événement et le contact
+            $event->addContact($contact);
+            $contact->addEvent($event);
 
            // Persister uniquement si on a des contacts
            if ($hasContact) {
@@ -218,6 +237,9 @@ class ImportJsonCommand extends Command
                $this->entityManager->flush();
                $io->text('Contact sauvegardé en base');
            }
+
+           $event->addContact($contact);
+           $contact->addEvent($event);
         }
         
         $io->success('Les données ont été importées avec succès.');
