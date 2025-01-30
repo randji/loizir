@@ -14,6 +14,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 #[ORM\Index(name: 'idx_date_start', columns: ['date_start'])]
 #[ORM\Index(name: 'idx_price_type', columns: ['price_type'])]
 #[ORM\Index(name: 'idx_audience', columns: ['audience'], options: ['lengths' => [255]])]  // Bonne syntaxe pour TEXT
+
+
+
 class Events
 {
     #[ORM\Id]
