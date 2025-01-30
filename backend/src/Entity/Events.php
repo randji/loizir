@@ -7,6 +7,9 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 
 
 #[ORM\Entity(repositoryClass: EventsRepository::class)]
@@ -15,7 +18,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 #[ORM\Index(name: 'idx_price_type', columns: ['price_type'])]
 #[ORM\Index(name: 'idx_audience', columns: ['audience'], options: ['lengths' => [255]])]  // Bonne syntaxe pour TEXT
 
-
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection()
+    ],
+    order: ['dateStart' => 'DESC'],
+    paginationItemsPerPage: 10
+)]
 
 class Events
 {

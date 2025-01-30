@@ -7,11 +7,21 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 
 #[ORM\Entity(repositoryClass: LocationsRepository::class)]
 #[ORM\Index(name: 'idx_address_name', columns: ['address_name'], options: ['lengths' => [255]])]
 #[ORM\Index(name: 'idx_address_street', columns: ['address_street'], options: ['lengths' => [255]])]
 #[ORM\Index(name: 'idx_address_zipcode', columns: ['address_zipcode'])]
+
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection()
+    ]
+)]
 
 class Locations
 {

@@ -20,11 +20,15 @@ services:
                chown -R www-data:www-data /var/www/html &&
                chmod -R 755 /var/www/html &&
                a2enmod rewrite &&
-               echo 'DocumentRoot /var/www/html/public' > /etc/apache2/sites-available/000-default.conf &&
-               echo '<Directory /var/www/html/public>
-                    AllowOverride All
-                    Require all granted
-               </Directory>' >> /etc/apache2/sites-available/000-default.conf &&
+               echo '<VirtualHost *:80>
+                    DocumentRoot /var/www/html/public
+                    DirectoryIndex /index.php
+                    <Directory /var/www/html/public>
+                        AllowOverride All
+                        Require all granted
+                        FallbackResource /index.php
+                    </Directory>
+               </VirtualHost>' > /etc/apache2/sites-available/000-default.conf &&
                apache2-foreground"
   db:
     image: mysql:latest
