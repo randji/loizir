@@ -32,7 +32,6 @@ services:
                apache2-foreground"
   db:
     image: mysql:latest
-    container_name: mysql-db
     environment:
       MYSQL_ROOT_PASSWORD: myfirstloizir
       MYSQL_DATABASE: symfony
@@ -42,23 +41,17 @@ services:
       - db_data:/var/lib/mysql
     restart: always
 
-  react:
-    image: node:18
-    container_name: react-app
-    working_dir: /app
-    volumes:
-      - ./frontend:/app
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: nextjs-app
     ports:
       - "3000:3000"
-    command: >
-      sh -c "if [ ! -f package.json ]; then 
-             npx create-react-app . --legacy-peer-deps &&
-             npm install web-vitals @babel/plugin-proposal-private-property-in-object --legacy-peer-deps;
-             fi &&
-             npm start -- --host 0.0.0.0"
-    environment:
-      - WDS_SOCKET_HOST=0.0.0.0
-      - WATCHPACK_POLLING=true
+    networks:
+      - default
+    depends_on:
+      - php
 
   phpmyadmin:
     image: phpmyadmin:latest

@@ -33,7 +33,7 @@ class Contacts
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $contact_phone = null;
-
+    
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $contact_mail = null;
 
@@ -45,6 +45,8 @@ class Contacts
     
     #[ORM\ManyToMany(targetEntity: Events::class, mappedBy: 'contacts')]
     private Collection $events;
+
+    
 
     public function __construct()
     {
