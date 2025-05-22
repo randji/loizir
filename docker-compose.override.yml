@@ -3,7 +3,7 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.dev   # <== Dockerfile spécial dev
+      dockerfile: dockerfile.dev   # <== Dockerfile spécial dev
     volumes:
       - ./frontend:/app
       - /app/node_modules
